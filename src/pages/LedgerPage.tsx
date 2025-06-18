@@ -126,9 +126,6 @@ export default function LedgerPage() {
 
   return (
     <Box sx={{ maxWidth: 600, mx: 'auto', mt: 0, mb: 8 }}>
-      <Typography variant="h5" fontWeight={700} align="center" gutterBottom sx={{ mt: 0 }}>
-        Ledger
-      </Typography>
       <Tabs
         value={tab}
         onChange={handleTabChange}
@@ -248,7 +245,17 @@ export default function LedgerPage() {
                     {formatLedgerTxDate(tx.date)}
                   </Typography>
                 </Box>
-                <Typography variant="h6" fontWeight={700}>
+                <Typography 
+                  variant="h6" 
+                  fontWeight={700}
+                  sx={{ 
+                    color: selectedEntry && (
+                      (tx.to === selectedEntry.name) ? theme.palette.secondary.main :  // Money received (green)
+                      (tx.from === selectedEntry.name) ? '#e57373' : // Money sent (red)
+                      'text.primary' // Fallback
+                    )
+                  }}
+                >
                   ₹{tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </Typography>
                 <Typography variant="body2">

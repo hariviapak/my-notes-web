@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
 import {
   AppBar,
   Box,
@@ -25,6 +25,17 @@ export default function Layout({ children, sidebarMinimized, setSidebarMinimized
   };
 
   const theme = useTheme();
+  const location = useLocation();
+
+  const getPageTitle = () => {
+    const path = location.pathname;
+    if (path === '/' || path === '/dashboard') return 'Dashboard';
+    if (path === '/notes') return 'Notes';
+    if (path === '/transactions') return 'Transactions';
+    if (path === '/ledger') return 'Ledger';
+    if (path === '/settings') return 'Settings';
+    return 'My Notes & Finance';
+  };
 
   const drawerWidth = 240;
   const miniDrawerWidth = 64;
@@ -52,7 +63,7 @@ export default function Layout({ children, sidebarMinimized, setSidebarMinimized
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            My Notes & Finance
+            {getPageTitle()}
           </Typography>
         </Toolbar>
       </AppBar>

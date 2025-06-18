@@ -6,12 +6,14 @@ import NotesPage from './pages/NotesPage';
 import TransactionsPage from './pages/TransactionsPage';
 import SettingsPage from './pages/SettingsPage';
 import LedgerPage from './pages/LedgerPage';
+import DashboardPage from './pages/DashboardPage';
 import { useEffect, useState } from 'react';
 import {
   Note as NoteIcon,
   Receipt as ReceiptIcon,
   AccountBalance as AccountBalanceIcon,
   Settings as SettingsIcon,
+  Dashboard as DashboardIcon,
 } from '@mui/icons-material';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { useMediaQuery, useTheme } from '@mui/material';
@@ -19,18 +21,21 @@ import { useMediaQuery, useTheme } from '@mui/material';
 const drawerWidth = 240;
 const miniDrawerWidth = 64;
 
+const navigationItems = [
+  { path: '/dashboard', icon: <DashboardIcon />, text: 'Dashboard' },
+  { path: '/notes', icon: <NoteIcon />, text: 'Notes' },
+  { path: '/transactions', icon: <ReceiptIcon />, text: 'Transactions' },
+  { path: '/ledger', icon: <AccountBalanceIcon />, text: 'Ledger' },
+  { path: '/settings', icon: <SettingsIcon />, text: 'Settings' },
+];
+
 function Sidebar({ minimized, iconsOnly, centerIcons }: { minimized: boolean; iconsOnly: boolean; centerIcons: boolean }) {
   const location = useLocation();
-  const menuItems = [
-    { text: 'Notes', icon: <NoteIcon />, path: '/notes' },
-    { text: 'Transactions', icon: <ReceiptIcon />, path: '/transactions' },
-    { text: 'Ledger', icon: <AccountBalanceIcon />, path: '/ledger' },
-    { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
-  ];
+  
   if (iconsOnly && centerIcons) {
     return (
       <Stack spacing={4} alignItems="center" justifyContent="center" sx={{ height: '100%' }}>
-        {menuItems.map((item) => (
+        {navigationItems.map((item) => (
           <ListItem
             button
             key={item.text}
@@ -62,7 +67,7 @@ function Sidebar({ minimized, iconsOnly, centerIcons }: { minimized: boolean; ic
     >
       <Toolbar />
       <List>
-        {menuItems.map((item) => (
+        {navigationItems.map((item) => (
           <ListItem
             button
             key={item.text}
@@ -137,7 +142,8 @@ function App() {
               onHamburgerClick={isMobile ? handleDrawerToggle : undefined}
             />
             <Routes>
-              <Route path="/" element={<NotesPage />} />
+              <Route path="/" element={<DashboardPage />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/notes" element={<NotesPage />} />
               <Route path="/transactions" element={<TransactionsPage />} />
               <Route path="/ledger" element={<LedgerPage />} />

@@ -67,44 +67,41 @@ export default function SettingsPage() {
         throw new Error('Invalid backup file format');
       }
 
-      // Merge logic for notes
+      // Merge logic for notes (by createdAt, keep latest updatedAt)
       const existingNotes = await db.notes.toArray();
-      const notesMap = new Map(existingNotes.map(n => [n.id, n]));
+      const notesByCreatedAt = new Map(existingNotes.map(n => [new Date(n.createdAt).getTime(), n]));
       for (const note of data.notes) {
-        if (note.id && notesMap.has(note.id)) {
-          if (!isEqual(notesMap.get(note.id), note)) {
-            // Add as new (remove id)
-            const { id, ...rest } = note;
-            await db.notes.add(rest);
+        const createdAtKey = new Date(note.createdAt).getTime();
+        const existing = notesByCreatedAt.get(createdAtKey);
+        if (existing) {
+          if (new Date(note.updatedAt).getTime() > new Date(existing.updatedAt).getTime()) {
+            await db.notes.update(existing.id!, note);
           }
-          // else: skip (identical)
         } else {
           await db.notes.add(note);
         }
       }
 
-      // Merge logic for transactions
+      // Merge logic for transactions (by composite key)
       const existingTxs = await db.transactions.toArray();
-      const txMap = new Map(existingTxs.map(t => [t.id, t]));
+      function txKey(tx: any) {
+        return [tx.amount, new Date(tx.date).getTime(), tx.type, tx.from, tx.to, tx.category].join('|');
+      }
+      const txKeys = new Set(existingTxs.map(txKey));
       for (const tx of data.transactions) {
-        if (tx.id && txMap.has(tx.id)) {
-          if (!isEqual(txMap.get(tx.id), tx)) {
-            const { id, ...rest } = tx;
-            await db.transactions.add(rest);
-          }
-        } else {
+        if (!txKeys.has(txKey(tx))) {
           await db.transactions.add(tx);
         }
       }
 
-      // Merge logic for categories
+      // Merge logic for categories (by id, as before)
       const existingCats = await db.categories.toArray();
       const catMap = new Map(existingCats.map(c => [c.id, c]));
       for (const cat of data.categories) {
         if (cat.id && catMap.has(cat.id)) {
+          // If different, update
           if (!isEqual(catMap.get(cat.id), cat)) {
-            const { id, ...rest } = cat;
-            await db.categories.add(rest);
+            await db.categories.update(cat.id, cat);
           }
         } else {
           await db.categories.add(cat);
