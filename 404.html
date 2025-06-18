@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="refresh" content="0; url=/my-notes-web/" />
+    <script>
+      // For client-side routing: redirect to the correct path
+      var l = window.location;
+      var path = l.pathname.replace(/^\/my-notes-web/, '');
+      window.location.replace('/my-notes-web/' + (path ? '#' + path : ''));
+    </script>
+  </head>
+  <body></body>
+</html> 
