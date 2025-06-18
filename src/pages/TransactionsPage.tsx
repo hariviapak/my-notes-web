@@ -143,6 +143,12 @@ export default function TransactionsPage() {
     }
   };
 
+  const sortedTransactions = [...filtered].sort((a, b) => {
+    const dateA = new Date(a.date).getTime();
+    const dateB = new Date(b.date).getTime();
+    return dateB - dateA;
+  });
+
   return (
     <>
       <Typography variant="h5" fontWeight={700} align="center" gutterBottom sx={{ mt: 0 }}>
@@ -171,14 +177,14 @@ export default function TransactionsPage() {
           sx={{ maxWidth: 420 }}
         />
       </Box>
-      {filtered.length === 0 ? (
+      {sortedTransactions.length === 0 ? (
         <Box sx={{ textAlign: 'center', color: 'text.secondary', mt: 8, maxWidth: 420, mx: 'auto' }}>
           <Typography variant="h6">No transactions found</Typography>
           <Typography variant="body2">Click the + button to add your first transaction!</Typography>
         </Box>
       ) : (
         <Stack spacing={3} sx={{ width: '100%', maxWidth: 420, mx: 'auto', alignItems: 'center', mt: 0.5 }}>
-          {filtered.map((tx) => {
+          {sortedTransactions.map((tx) => {
             console.log('Rendering card:', tx);
             return (
               <Card

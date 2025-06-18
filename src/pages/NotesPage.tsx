@@ -137,6 +137,12 @@ export default function NotesPage() {
     }
   };
 
+  const sortedNotes = [...filteredNotes].sort((a, b) => {
+    const dateA = new Date(a.date || a.createdAt).getTime();
+    const dateB = new Date(b.date || b.createdAt).getTime();
+    return dateB - dateA;
+  });
+
   return (
     <>
       <Typography variant="h5" fontWeight={700} align="center" gutterBottom sx={{ mt: 1 }}>
@@ -169,14 +175,14 @@ export default function NotesPage() {
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
           <Typography>Loading...</Typography>
         </Box>
-      ) : filteredNotes.length === 0 ? (
+      ) : sortedNotes.length === 0 ? (
         <Box sx={{ textAlign: 'center', color: 'text.secondary', mt: 8, maxWidth: 420, mx: 'auto' }}>
           <Typography variant="h6">No notes found</Typography>
           <Typography variant="body2">Click the + button to add your first note!</Typography>
         </Box>
       ) : (
         <Stack spacing={3} sx={{ width: '100%', maxWidth: 420, mx: 'auto', alignItems: 'center', mt: 0.5 }}>
-          {filteredNotes.map((note) => (
+          {sortedNotes.map((note) => (
             <Card
               key={note.id}
               sx={{
