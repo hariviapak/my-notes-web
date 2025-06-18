@@ -11,6 +11,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Stack,
 } from '@mui/material';
 import { db } from '../db/database';
 import isEqual from 'lodash/isEqual';
@@ -132,18 +133,20 @@ export default function SettingsPage() {
           <Typography variant="h6" gutterBottom>
             Backup & Restore
           </Typography>
-          <Box sx={{ mt: 2 }}>
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={2}
+            sx={{ alignItems: { xs: 'stretch', sm: 'center' }, mt: 2 }}
+          >
             <Button
               variant="contained"
               onClick={handleExport}
-              sx={{ mr: 2 }}
             >
               Export Backup
             </Button>
             <Button
               variant="outlined"
               component="label"
-              sx={{ mr: 2 }}
             >
               Import Backup
               <input
@@ -160,7 +163,7 @@ export default function SettingsPage() {
             >
               Clear All Transactions
             </Button>
-          </Box>
+          </Stack>
         </CardContent>
       </Card>
       <Snackbar
