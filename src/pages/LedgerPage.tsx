@@ -68,6 +68,17 @@ function groupByPerson(transactions: Transaction[], mode: 'transfers' | 'all'): 
   return Object.values(ledger);
 }
 
+function formatLedgerTxDate(date: Date | string | undefined) {
+  if (!date) return '';
+  const d = new Date(date);
+  return d.toLocaleDateString(undefined, {
+    weekday: 'short',
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
 export default function LedgerPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [entries, setEntries] = useState<LedgerEntry[]>([]);
@@ -114,8 +125,8 @@ export default function LedgerPage() {
     : [];
 
   return (
-    <Box sx={{ maxWidth: 600, mx: 'auto', mt: 4, mb: 8 }}>
-      <Typography variant="h5" fontWeight={700} align="center" gutterBottom sx={{ mt: 1 }}>
+    <Box sx={{ maxWidth: 600, mx: 'auto', mt: 0, mb: 8 }}>
+      <Typography variant="h5" fontWeight={700} align="center" gutterBottom sx={{ mt: 0 }}>
         Ledger
       </Typography>
       <Tabs
@@ -138,13 +149,16 @@ export default function LedgerPage() {
           </Grid>
         ) : (
           entries.map((entry) => (
-            <Grid item xs={12} key={entry.name}>
+            <Grid item xs={12} key={entry.name} sx={{ display: 'flex', justifyContent: 'center' }}>
               <Card
                 sx={{
-                  borderRadius: 4,
+                  borderRadius: 2,
                   background: theme.palette.secondary.light + '10',
                   boxShadow: '0 2px 16px 0 rgba(123,183,198,0.08)',
-                  p: 1,
+                  p: 3,
+                  maxWidth: 420,
+                  width: '100%',
+                  mb: 2,
                   cursor: 'pointer',
                 }}
                 onClick={() => handleCardClick(entry)}
@@ -231,7 +245,7 @@ export default function LedgerPage() {
                     }}
                   />
                   <Typography variant="body2" color="text.secondary">
-                    {tx.date instanceof Date ? tx.date.toISOString().slice(0, 10) : String(tx.date).slice(0, 10)}
+                    {formatLedgerTxDate(tx.date)}
                   </Typography>
                 </Box>
                 <Typography variant="h6" fontWeight={700}>

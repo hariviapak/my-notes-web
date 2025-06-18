@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ThemeProvider, CssBaseline, Box, Drawer, Toolbar, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { ThemeProvider, CssBaseline, Box, Drawer, Toolbar, List, ListItem, ListItemIcon, ListItemText, Stack } from '@mui/material';
 import zenTheme from './styles/zenTheme';
 import Layout from './components/Layout';
 import NotesPage from './pages/NotesPage';
@@ -14,11 +14,12 @@ import {
   Settings as SettingsIcon,
 } from '@mui/icons-material';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
+import { useMediaQuery, useTheme } from '@mui/material';
 
 const drawerWidth = 240;
 const miniDrawerWidth = 64;
 
-function Sidebar({ minimized }: { minimized: boolean }) {
+function Sidebar({ minimized, iconsOnly, centerIcons }: { minimized: boolean; iconsOnly: boolean; centerIcons: boolean }) {
   const location = useLocation();
   const menuItems = [
     { text: 'Notes', icon: <NoteIcon />, path: '/notes' },
@@ -26,6 +27,24 @@ function Sidebar({ minimized }: { minimized: boolean }) {
     { text: 'Ledger', icon: <AccountBalanceIcon />, path: '/ledger' },
     { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
   ];
+  if (iconsOnly && centerIcons) {
+    return (
+      <Stack spacing={4} alignItems="center" justifyContent="center" sx={{ height: '100%' }}>
+        {menuItems.map((item) => (
+          <ListItem
+            button
+            key={item.text}
+            component={RouterLink}
+            to={item.path}
+            selected={location.pathname === item.path}
+            sx={{ justifyContent: 'center', px: 0 }}
+          >
+            <ListItemIcon sx={{ minWidth: 0, justifyContent: 'center' }}>{item.icon}</ListItemIcon>
+          </ListItem>
+        ))}
+      </Stack>
+    );
+  }
   return (
     <Drawer
       variant="permanent"
@@ -53,7 +72,7 @@ function Sidebar({ minimized }: { minimized: boolean }) {
             sx={{ justifyContent: minimized ? 'center' : 'flex-start', px: minimized ? 0 : 2 }}
           >
             <ListItemIcon sx={{ minWidth: 0, justifyContent: 'center' }}>{item.icon}</ListItemIcon>
-            {!minimized && <ListItemText primary={item.text} />}
+            {!minimized && !iconsOnly && <ListItemText primary={item.text} />}
           </ListItem>
         ))}
       </List>
@@ -63,6 +82,9 @@ function Sidebar({ minimized }: { minimized: boolean }) {
 
 function App() {
   const [sidebarMinimized, setSidebarMinimized] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
     const link = document.createElement('link');
@@ -74,14 +96,46 @@ function App() {
     };
   }, []);
 
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
+
   return (
     <ThemeProvider theme={zenTheme}>
       <CssBaseline />
-      <Router>
+      <Router basename={import.meta.env.BASE_URL}>
         <Box sx={{ display: 'flex', width: '100vw', minHeight: '100vh', bgcolor: 'background.default' }}>
-          <Sidebar minimized={sidebarMinimized} />
+          {isMobile ? (
+            <Drawer
+              variant="temporary"
+              open={mobileOpen}
+              onClose={handleDrawerToggle}
+              ModalProps={{ keepMounted: true }}
+              sx={{
+                display: { xs: 'block', sm: 'none' },
+                '& .MuiDrawer-paper': {
+                  boxSizing: 'border-box',
+                  width: 72,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  pt: 4,
+                  pb: 4,
+                },
+              }}
+            >
+              <Sidebar minimized={true} iconsOnly centerIcons />
+            </Drawer>
+          ) : (
+            <Sidebar minimized={sidebarMinimized} iconsOnly={false} centerIcons={false} />
+          )}
           <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', p: 0 }}>
-            <Layout sidebarMinimized={sidebarMinimized} setSidebarMinimized={setSidebarMinimized} />
+            <Layout
+              sidebarMinimized={sidebarMinimized}
+              setSidebarMinimized={setSidebarMinimized}
+              onHamburgerClick={isMobile ? handleDrawerToggle : undefined}
+            />
             <Routes>
               <Route path="/" element={<NotesPage />} />
               <Route path="/notes" element={<NotesPage />} />

@@ -6,6 +6,7 @@ import {
   IconButton,
   Toolbar,
   Typography,
+  useTheme,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -15,12 +16,15 @@ interface LayoutProps {
   children?: ReactNode;
   sidebarMinimized: boolean;
   setSidebarMinimized: (minimized: boolean) => void;
+  onHamburgerClick?: () => void;
 }
 
-export default function Layout({ children, sidebarMinimized, setSidebarMinimized }: LayoutProps) {
+export default function Layout({ children, sidebarMinimized, setSidebarMinimized, onHamburgerClick }: LayoutProps) {
   const handleDrawerToggle = () => {
     setSidebarMinimized(!sidebarMinimized);
   };
+
+  const theme = useTheme();
 
   const drawerWidth = 240;
   const miniDrawerWidth = 64;
@@ -30,8 +34,8 @@ export default function Layout({ children, sidebarMinimized, setSidebarMinimized
       <AppBar
         position="fixed"
         sx={{
-          width: `calc(100% - ${sidebarMinimized ? miniDrawerWidth : drawerWidth}px)`,
-          ml: `${sidebarMinimized ? miniDrawerWidth : drawerWidth}px`,
+          width: { xs: '100%', sm: `calc(100% - ${sidebarMinimized ? miniDrawerWidth : drawerWidth}px)` },
+          ml: { xs: 0, sm: `${sidebarMinimized ? miniDrawerWidth : drawerWidth}px` },
           transition: 'width 0.2s, margin-left 0.2s',
           boxShadow: 'none',
           background: '#7bb7c6',
@@ -42,7 +46,7 @@ export default function Layout({ children, sidebarMinimized, setSidebarMinimized
             color="inherit"
             aria-label="toggle sidebar"
             edge="start"
-            onClick={handleDrawerToggle}
+            onClick={onHamburgerClick || handleDrawerToggle}
             sx={{ mr: 2 }}
           >
             <MenuIcon />

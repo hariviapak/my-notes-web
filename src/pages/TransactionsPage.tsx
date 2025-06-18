@@ -149,6 +149,17 @@ export default function TransactionsPage() {
     return dateB - dateA;
   });
 
+  function formatTxDate(date: Date | string | undefined) {
+    if (!date) return '';
+    const d = new Date(date);
+    return d.toLocaleDateString(undefined, {
+      weekday: 'short',
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+  }
+
   return (
     <>
       <Typography variant="h5" fontWeight={700} align="center" gutterBottom sx={{ mt: 0 }}>
@@ -190,7 +201,7 @@ export default function TransactionsPage() {
               <Card
                 key={tx.id}
                 sx={{
-                  borderRadius: 4,
+                  borderRadius: 2,
                   background: theme.palette.secondary.light + '10',
                   boxShadow: '0 2px 16px 0 rgba(123,183,198,0.08)',
                   p: 3,
@@ -212,9 +223,7 @@ export default function TransactionsPage() {
                       }}
                     />
                     <Typography variant="body2" color="text.secondary">
-                      {tx.date instanceof Date
-                        ? tx.date.toISOString().slice(0, 10)
-                        : String(tx.date).slice(0, 10)}
+                      {formatTxDate(tx.date)}
                     </Typography>
                     <IconButton onClick={() => handleOpenDialog(tx)} size="small" color="primary">
                       <EditIcon fontSize="small" />

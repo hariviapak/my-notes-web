@@ -45,6 +45,7 @@ export default function NotesPage() {
   const [editId, setEditId] = useState<number | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [date, setDate] = useState<Date | null>(new Date());
+  const [viewNote, setViewNote] = useState<Note | null>(null);
 
   useEffect(() => {
     loadNotes();
@@ -143,6 +144,17 @@ export default function NotesPage() {
     return dateB - dateA;
   });
 
+  function formatNoteDate(date: Date | string | undefined) {
+    if (!date) return '';
+    const d = new Date(date);
+    return d.toLocaleDateString(undefined, {
+      weekday: 'short',
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+  }
+
   return (
     <>
       <Typography variant="h5" fontWeight={700} align="center" gutterBottom sx={{ mt: 1 }}>
@@ -186,24 +198,26 @@ export default function NotesPage() {
             <Card
               key={note.id}
               sx={{
-                borderRadius: 4,
-                background: 'linear-gradient(135deg, #e3f0ff 0%, #f3e8ff 100%)',
-                boxShadow: '0 4px 24px 0 rgba(123,183,198,0.10)',
+                borderRadius: 2,
+                background: '#fff',
+                boxShadow: '0 2px 16px 0 rgba(123,183,198,0.08)',
                 p: 3,
                 width: '100%',
                 mb: 2,
+                cursor: 'pointer',
               }}
+              onClick={() => setViewNote(note)}
             >
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
                 <Box />
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Typography variant="body2" color="text.secondary">
-                    {note.date ? new Date(note.date).toISOString().slice(0, 10) : ''}
+                    {formatNoteDate(note.date)}
                   </Typography>
-                  <IconButton onClick={() => handleOpenEditor(note)} size="small" color="primary">
+                  <IconButton onClick={e => { e.stopPropagation(); handleOpenEditor(note); }} size="small" color="primary">
                     <EditIcon fontSize="small" />
                   </IconButton>
-                  <IconButton onClick={() => setDeleteId(note.id ?? null)} size="small" color="error">
+                  <IconButton onClick={e => { e.stopPropagation(); setDeleteId(note.id ?? null); }} size="small" color="error">
                     <DeleteIcon fontSize="small" />
                   </IconButton>
                 </Box>
@@ -212,31 +226,32 @@ export default function NotesPage() {
                 <Typography variant="h6" fontWeight={700} sx={{ mb: 1, color: '#7b6eea' }}>
                   {note.title}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                  {note.category}
-                  {note.tags.length > 0 && (
-                    <>
-                      {' '}
-                      {note.tags.map((tag) => (
-                        <Chip
-                          key={tag}
-                          label={tag}
-                          size="small"
-                          sx={{ mr: 0.5, mb: 0.5 }}
-                        />
-                      ))}
-                    </>
-                  )}
-                </Typography>
                 <Typography
                   variant="body2"
                   color="text.secondary"
-                  sx={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
+                  sx={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', mb: 0.5 }}
                 >
                   {/* Strip HTML tags for preview */}
                   {note.content.replace(/<[^>]+>/g, '').slice(0, 120)}
                   {note.content.replace(/<[^>]+>/g, '').length > 120 ? '...' : ''}
                 </Typography>
+                {note.category && (
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                    {note.category}
+                  </Typography>
+                )}
+                {note.tags.length > 0 && (
+                  <Box sx={{ mt: 0.5 }}>
+                    {note.tags.map((tag) => (
+                      <Chip
+                        key={tag}
+                        label={tag}
+                        size="small"
+                        sx={{ mr: 0.5, mb: 0.5 }}
+                      />
+                    ))}
+                  </Box>
+                )}
               </Box>
             </Card>
           ))}
@@ -328,6 +343,25 @@ export default function NotesPage() {
           <Button color="error" variant="contained" onClick={handleDelete}>
             Delete
           </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={!!viewNote} onClose={() => setViewNote(null)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ fontSize: 28, fontWeight: 700, color: '#7b6eea', pb: 0 }}>
+          {viewNote?.title}
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            {formatNoteDate(viewNote?.date)}
+          </Typography>
+          <Box sx={{ minHeight: 120 }}>
+            <div
+              style={{ fontSize: 18, color: '#444', lineHeight: 1.7 }}
+              dangerouslySetInnerHTML={{ __html: viewNote?.content || '' }}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setViewNote(null)}>Close</Button>
         </DialogActions>
       </Dialog>
     </>
